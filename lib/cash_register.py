@@ -5,7 +5,6 @@ class CashRegister:
         self.items = []
         self.previous_transactions = []
 
-    # DISCOUNT PROPERTY
     @property
     def discount(self):
         return self._discount
@@ -18,14 +17,14 @@ class CashRegister:
             print("Not valid discount")
             self._discount = 0
 
-    # METHODS
-    def add_item(self, item, price, quantity):
-        item_total = price * quantity
+    def add_item(self, item, price, quantity=1):
+        # update total
+        self.total += price * quantity
 
-        self.total += item_total
+        # store each item per quantity (IMPORTANT FOR TESTS)
+        self.items.extend([item] * quantity)
 
-        self.items.append(item)
-
+        # store transaction
         self.previous_transactions.append({
             "item": item,
             "price": price,
@@ -37,7 +36,7 @@ class CashRegister:
             print("There is no discount to apply.")
             return
 
-        self.total = self.total - (self.total * self.discount / 100)
+        self.total -= self.total * (self.discount / 100)
 
         self.previous_transactions.pop()
 
@@ -49,5 +48,7 @@ class CashRegister:
 
         self.total -= last["price"] * last["quantity"]
 
-        if last["item"] in self.items:
-            self.items.remove(last["item"])
+        # remove items correctly per quantity
+        for _ in range(last["quantity"]):
+            if last["item"] in self.items:
+                self.items.remove(last["item"])
